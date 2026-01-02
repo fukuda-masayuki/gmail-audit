@@ -80,6 +80,9 @@ poetry run python catalog.py
   - OAuth ローカルサーバのバインドアドレス
 - `OAUTH_PORT` (デフォルト: 8080)
   - OAuth ローカルサーバの待ち受けポート
+- `GMAIL_QUERY`
+  - Gmail の検索クエリを上書きしたい場合に指定する
+  - 未指定時は、登録/認証/Welcome 系に寄せたデフォルトクエリを使用する
 
 ## 出力ファイル
 

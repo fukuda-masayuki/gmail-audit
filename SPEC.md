@@ -45,8 +45,9 @@ Gmail全体から「アカウント登録/認証/Welcome系メール」を手掛
 ## 7. データ取得仕様
 ### 7.1 Gmail検索クエリ（初期案）
 - 目的: 登録/認証/Welcome系を優先して拾う
-- 例:
-  - `in:anywhere (subject:(welcome OR verify OR verification OR confirm OR confirmation OR 登録 OR 認証 OR 確認) OR "confirm your email" OR "verify your email")`
+- 例（デフォルトクエリのイメージ）:
+  - `in:anywhere (subject:(welcome OR verify OR verification OR confirm OR confirmation OR 登録 OR 認証 OR 認証コード OR アカウント OR パスワード) OR "confirm your email" OR "verify your email")`
+- 実際のクエリ文字列は `DEFAULT_GMAIL_QUERY` としてコード側に定義し、環境変数 `GMAIL_QUERY` で上書き可能とする
 
 ### 7.2 取得API
 - `users.messages.list` で message id を収集
