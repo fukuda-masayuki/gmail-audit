@@ -1,0 +1,29 @@
+__pycache__/
+*.py[cod]
+*.swp
+*.swo
+
+# venv / poetry
+.venv/
+venv/
+.python-version
+poetry.lock
+
+# macOS
+.DS_Store
+
+# vscode
+.vscode/
+
+# credentials / tokens / outputs
+credentials.json
+token.json
+sites_from_gmail.csv
+
+# legacy / unused
+Dockerfile
+requirements.txt
+main.py
+
+# others
+*.log

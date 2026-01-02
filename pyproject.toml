@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "gmail-audit"
+version = "0.1.0"
+description = "Gmail registration/auth mail audit tool (PoC)"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [
+    { include = "gmail_audit" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+google-api-python-client = "*"
+google-auth-httplib2 = "*"
+google-auth-oauthlib = "*"
+pandas = "*"
+tldextract = "*"
+
+[tool.poetry.group.dev.dependencies]
+black = "*"
+ruff = "*"
+
+[tool.poetry.scripts]
+# `poetry run gmail-audit` で実行できるようにする
+"gmail-audit" = "gmail_audit.main:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
