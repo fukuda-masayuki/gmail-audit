@@ -15,6 +15,7 @@ class DomainRecord:
     count: int = 0
     sample_from: str = ""
     sample_subject: str = ""
+    sample_list_id: str = ""
 
 
 def _get_header_value(headers: List[Dict[str, str]], name: str) -> Optional[str]:
@@ -31,24 +32,25 @@ def _extract_email_address(raw_address: str) -> Optional[str]:
     return email_addr
 
 
-def extract_domain_from_headers(headers: List[Dict[str, str]]) -> Tuple[Optional[str], Optional[str], Optional[str], Optional[str]]:
+def extract_domain_from_headers(headers: List[Dict[str, str]]) -> Tuple[Optional[str], Optional[str], Optional[str], Optional[str], Optional[str]]:
     reply_to = _get_header_value(headers, "Reply-To")
     from_ = _get_header_value(headers, "From")
     subject = _get_header_value(headers, "Subject")
+    list_id = _get_header_value(headers, "List-Id")
 
     address_source = reply_to or from_
     if not address_source:
-        return None, from_, reply_to, subject
+        return None, from_, reply_to, subject, list_id
 
     email_addr = _extract_email_address(address_source)
     if not email_addr:
-        return None, from_, reply_to, subject
+        return None, from_, reply_to, subject, list_id
 
     domain_part = email_addr.split("@", 1)[1].lower()
     extracted = tldextract.extract(domain_part)
 
     if not extracted.domain or not extracted.suffix:
-        return None, from_, reply_to, subject
+        return None, from_, reply_to, subject, list_id
 
     normalized_domain = f"{extracted.domain}.{extracted.suffix}"
-    return normalized_domain, from_, reply_to, subject
+    return normalized_domain, from_, reply_to, subject, list_id

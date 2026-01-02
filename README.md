@@ -30,7 +30,7 @@ poetry install
 
 ## 実行方法
 
-### 1. Poetry 経由でスクリプトを実行
+### 1. Gmail スキャン（sites_from_gmail.csv 作成）
 
 ```bash
 poetry run python -m gmail_audit.main
@@ -51,6 +51,16 @@ poetry run gmail-audit
 
 2 回目以降は `token.json` を再利用するため、ブラウザでの認証は通常不要です。
 
+### 3. カタログ生成（sites_catalog.csv 作成）
+
+Gmail スキャン後、下記コマンドでカテゴリ付きカタログ `sites_catalog.csv` を生成します。
+
+```bash
+poetry run python catalog.py
+```
+
+初回実行時に `categories.yml` が存在しない場合、サンプル入りの雛形を自動生成します。
+
 ## コード構成
 
 - [gmail_audit/config.py](gmail_audit/config.py): 環境変数や定数の定義
@@ -60,6 +70,7 @@ poetry run gmail-audit
 - [gmail_audit/aggregator.py](gmail_audit/aggregator.py): メール単位の集計処理
 - [gmail_audit/output.py](gmail_audit/output.py): CSV 出力処理
 - [gmail_audit/main.py](gmail_audit/main.py): 上記を組み合わせたエントリポイント
+- [gmail_audit/catalog.py](gmail_audit/catalog.py): `sites_from_gmail.csv` を読み取り、カテゴリ付き `sites_catalog.csv` を生成
 
 ## 環境変数
 
@@ -77,6 +88,14 @@ poetry run gmail-audit
   - `count`: 観測メッセージ数
   - `sample_from`: サンプルの From / Reply-To
   - `sample_subject`: サンプルの Subject
+  - `sample_list_id`: List-Id が取得できた場合のサンプル値
+- `sites_catalog.csv`
+  - `service_name`: ドメインから推測したサービス名（Title Case）
+  - `category`: `categories.yml` またはルールに基づくカテゴリ
+  - `source`: `dict` (辞書命中) / `rule` (件名ルール) / `unknown`
+  - `notes`: 予備欄（現状は空）
+
+`categories.yml` を編集することで任意のドメインにカテゴリを手動で割り当てられます。辞書に無いドメインは件名キーワード（newsletter / unsubscribe / メルマガ / 配信停止 → `newsletter`、receipt / invoice / 領収書 / ご注文 / 配送 / shipped → `transaction`）で推定され、該当しなければ `unknown` になります。
 
 ## 注意事項
 

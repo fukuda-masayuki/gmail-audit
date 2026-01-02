@@ -15,6 +15,7 @@ google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 pandas = "*"
 tldextract = "*"
+pyyaml = "*"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"

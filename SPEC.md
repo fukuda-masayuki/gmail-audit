@@ -23,6 +23,8 @@ Gmail全体から「アカウント登録/認証/Welcome系メール」を手掛
   - count: 観測数
   - sample_from: サンプルFrom（またはReply-To）
   - sample_subject: サンプルSubject
+  - sample_list_id: List-Id ヘッダーのサンプル（取得できた場合）
+- 登録済みCSVを元にカテゴリ付き `sites_catalog.csv` を生成する
 
 ## 5. 技術要件
 - 言語: Python 3.12

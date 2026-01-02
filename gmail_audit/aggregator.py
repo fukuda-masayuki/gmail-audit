@@ -25,7 +25,7 @@ def aggregate_domains(client: GmailClient, message_ids: List[str]) -> List[Domai
             logger.warning("message_id=%s の取得に失敗しました: %s", message_id, exc)
             continue
 
-        domain, from_, reply_to, subject = extract_domain_from_headers(headers)
+        domain, from_, reply_to, subject, list_id = extract_domain_from_headers(headers)
         if not domain:
             continue
 
@@ -35,6 +35,7 @@ def aggregate_domains(client: GmailClient, message_ids: List[str]) -> List[Domai
                 domain=domain,
                 sample_from=reply_to or from_ or "",
                 sample_subject=subject or "",
+                sample_list_id=list_id or "",
             )
             stats[domain] = record
 

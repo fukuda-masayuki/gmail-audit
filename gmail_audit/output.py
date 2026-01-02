@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def save_to_csv(records: Iterable[DomainRecord], path: Path) -> None:
     records = list(records)
-    columns = ["domain", "count", "sample_from", "sample_subject"]
+    columns = ["domain", "count", "sample_from", "sample_subject", "sample_list_id"]
 
     if not records:
         df = pd.DataFrame(columns=columns)

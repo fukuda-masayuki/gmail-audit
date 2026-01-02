@@ -14,6 +14,8 @@ SCOPES: Final[List[str]] = ["https://www.googleapis.com/auth/gmail.readonly"]
 TOKEN_PATH: Final[Path] = Path("token.json")
 CREDENTIALS_PATH: Final[Path] = Path("credentials.json")
 OUTPUT_CSV_PATH: Final[Path] = Path("sites_from_gmail.csv")
+CATEGORIES_YAML_PATH: Final[Path] = Path("categories.yml")
+SITES_CATALOG_CSV_PATH: Final[Path] = Path("sites_catalog.csv")
 
 GMAIL_QUERY: Final[str] = (
     "in:anywhere (subject:(welcome OR verify OR verification OR confirm OR "

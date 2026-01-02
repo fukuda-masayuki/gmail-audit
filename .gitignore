@@ -7,7 +7,6 @@ __pycache__/
 .venv/
 venv/
 .python-version
-poetry.lock
 
 # macOS
 .DS_Store
@@ -19,6 +18,7 @@ poetry.lock
 credentials.json
 token.json
 sites_from_gmail.csv
+sites_catalog.csv
 
 # legacy / unused
 Dockerfile
