@@ -91,7 +91,6 @@ poetry run python catalog.py
   - `count`: 観測メッセージ数
   - `sample_from`: サンプルの From / Reply-To
   - `sample_subject`: サンプルの Subject
-  - `sample_list_id`: List-Id が取得できた場合のサンプル値
 - `sites_catalog.csv`
   - `service_name`: ドメインから推測したサービス名（Title Case）
   - `category`: `categories.yml` またはルールに基づくカテゴリ
