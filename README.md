@@ -30,7 +30,21 @@ poetry install
 
 ## 実行方法
 
-### 1. Gmail スキャン（sites_from_gmail.csv 作成）
+### 1. 初回 OAuth（ローカル専用）
+
+本番環境（GCP など）ではブラウザベースの OAuth フローは行わず、あらかじめローカル環境で `token.json` を生成しておきます。
+
+```bash
+poetry run python scripts/authorize.py
+```
+
+- ターミナルに認可 URL が表示されます
+- その URL をブラウザで開き、Gmail アカウントで許可します
+- リダイレクト先 (デフォルト: `http://localhost:8080`) でフローが完了し、プロジェクト直下に `token.json` が生成されます
+
+2 回目以降は `token.json` を再利用するため、通常は `scripts/authorize.py` を再度実行する必要はありません。
+
+### 2. Gmail スキャン（sites_from_gmail.csv 作成）
 
 ```bash
 poetry run python -m gmail_audit.main
@@ -42,14 +56,7 @@ poetry run python -m gmail_audit.main
 poetry run gmail-audit
 ```
 
-### 2. 初回実行時のフロー
-
-1. ターミナルに認可 URL が表示されます
-2. その URL をブラウザで開き、Gmail アカウントで許可します
-3. リダイレクト先 (デフォルト: `http://localhost:8080`) でフローが完了し、プロジェクト直下に `token.json` が生成されます
-4. メールのスキャン完了後、`sites_from_gmail.csv` がカレントディレクトリに出力されます
-
-2 回目以降は `token.json` を再利用するため、ブラウザでの認証は通常不要です。
+- メールのスキャン完了後、`sites_from_gmail.csv` がカレントディレクトリに出力されます
 
 ### 3. カタログ生成（sites_catalog.csv 作成）
 
@@ -64,22 +71,25 @@ poetry run python catalog.py
 ## コード構成
 
 - [gmail_audit/config.py](gmail_audit/config.py): 環境変数や定数の定義
-- [gmail_audit/auth.py](gmail_audit/auth.py): OAuth 認証フローの実装
+- [gmail_audit/auth.py](gmail_audit/auth.py): `token.json` を前提とした実行時の認証ヘルパー（初回 OAuth フローは含まない）
 - [gmail_audit/gmail_client.py](gmail_audit/gmail_client.py): Gmail API クライアントの薄いラッパー
 - [gmail_audit/domain.py](gmail_audit/domain.py): ドメイン抽出ロジックとデータモデル
 - [gmail_audit/aggregator.py](gmail_audit/aggregator.py): メール単位の集計処理
 - [gmail_audit/output.py](gmail_audit/output.py): CSV 出力処理
 - [gmail_audit/main.py](gmail_audit/main.py): 上記を組み合わせたエントリポイント
 - [gmail_audit/catalog.py](gmail_audit/catalog.py): `sites_from_gmail.csv` を読み取り、カテゴリ付き `sites_catalog.csv` を生成
+- [scripts/authorize.py](scripts/authorize.py): ローカル専用の初回 OAuth フローを実行し、`token.json` を生成するスクリプト
 
 ## 環境変数
 
 - `MAX_MESSAGES` (デフォルト: 500)
   - Gmail 検索結果から最大何件までメッセージを取得するか
 - `OAUTH_HOST` (デフォルト: localhost)
-  - OAuth ローカルサーバのバインドアドレス
+  - `scripts/authorize.py` が起動する OAuth ローカルサーバのバインドアドレス
+  - Google のポリシーにより、リダイレクト URI としては `http://localhost:PORT` / `http://127.0.0.1:PORT` のループバックアドレスのみを想定しています
+  - Docker コンテナ内で実行する場合も、コンテナ内では `localhost` でバインドし、`-p 8080:8080` などでホスト側へポート公開してください
 - `OAUTH_PORT` (デフォルト: 8080)
-  - OAuth ローカルサーバの待ち受けポート
+  - `scripts/authorize.py` が待ち受けるポート
 - `GMAIL_QUERY`
   - Gmail の検索クエリを上書きしたい場合に指定する
   - 未指定時は、登録/認証/Welcome 系に寄せたデフォルトクエリを使用する
@@ -104,4 +114,10 @@ poetry run python catalog.py
 - `credentials.json` と `token.json` は機密情報のため、必ず `.gitignore` による除外を行ってください
 - このツールは PoC であり、メールが来ないサービスは検出できません
 - メール本文は扱わず、ヘッダー情報のみを利用しています
+
+## GCP / 本番環境での利用イメージ
+
+- 本番コンテナ（例: Cloud Run / Cloud Run Jobs）には `gmail_audit` パッケージと `token.json` のみを含め、ブラウザを開くような OAuth フローは含めません。
+- `token.json` はローカル環境などで [scripts/authorize.py](scripts/authorize.py) を実行して作成し、コンテナイメージに同梱するか、Secret Manager などからマウントして参照します。
+- 本番実行時は [gmail_audit/main.py](gmail_audit/main.py) から `get_credentials()` を呼び出し、`token.json` を前提として Gmail API にアクセスします。
 # gmail-audit

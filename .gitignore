@@ -23,7 +23,6 @@ sites_catalog.csv
 # legacy / unused
 Dockerfile
 requirements.txt
-main.py
 
 # others
 *.log

@@ -39,7 +39,8 @@ Gmail全体から「アカウント登録/認証/Welcome系メール」を手掛
 - OAuthクライアント: Desktop/Installed
 - 利用スコープ: `https://www.googleapis.com/auth/gmail.readonly`
 - `credentials.json` をプロジェクト直下に配置
-- 初回実行で `token.json` を生成し、2回目以降は再利用する
+- ローカル専用スクリプト（`scripts/authorize.py`）で初回 OAuth フローを実行し、`token.json` を生成する
+- 実行時のコード（`gmail_audit.auth.get_credentials`）は、あらかじめ生成された `token.json` の存在を前提とし、本番環境ではブラウザを開くようなフローは行わない
 
 ## 7. データ取得仕様
 ### 7.1 Gmail検索クエリ（初期案）
@@ -61,19 +62,22 @@ Gmail全体から「アカウント登録/認証/Welcome系メール」を手掛
 
 ## 9. 実行パラメータ（環境変数）
 - `MAX_MESSAGES`（default: 500）
-- `OAUTH_HOST`（default: 0.0.0.0）  ※Docker内で待ち受ける
-- `OAUTH_PORT`（default: 8080）
+- `OAUTH_HOST`（default: localhost）  ※`scripts/authorize.py` が起動する OAuth ローカルサーバのバインドアドレス（Google のポリシー上、localhost/127.0.0.1 のループバックを想定）
+- `OAUTH_PORT`（default: 8080）       ※`scripts/authorize.py` が待ち受けるポート
 
-## 10. ローカル実行方法（Docker）
+## 10. ローカル実行方法（Docker 想定）
 ### 10.1 ビルド
 - `docker build -t gmail-audit .`
 
-### 10.2 実行（token/CSVをホストに残すためマウント必須）
-- `docker run --rm -p 8080:8080 -v "$(pwd):/app" gmail-audit`
+### 10.2 初回 OAuth（ローカル専用）
+- `docker run --rm -p 8080:8080 -v "$(pwd):/app" gmail-audit python scripts/authorize.py`
 
-### 10.3 期待動作
-- 初回: コンソールに認証URLが出る → ブラウザで許可 → `token.json` 作成
-- `sites_from_gmail.csv` が生成される
+コンソールに認証URLが出る → ブラウザで許可 → `token.json` がボリュームマウント先（例: `$(pwd)`）に作成されることを想定する。
+
+### 10.3 Gmail スキャン実行
+- `docker run --rm -v "$(pwd):/app" gmail-audit`
+
+`sites_from_gmail.csv` がボリュームマウント先（例: `$(pwd)`）に生成されることを想定する。
 
 ## 11. セキュリティ
 - `credentials.json` と `token.json` は絶対にGitへコミットしない
